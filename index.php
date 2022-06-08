@@ -31,7 +31,7 @@ if($result){
 <body>
    <h1>Buscador</h1>
    
-   <form action="">
+   <form action="" id="searchproduct">
        <input type="text" placeholder="Ingrese producto" name="producto" id="producto">
        <input type="submit" id="enviar">
 
@@ -40,6 +40,30 @@ if($result){
 
        </div>
    </form>
+
+
+     
+   <form action="" id="searchClient">
+       <input type="text" placeholder="Ingrese nombre del cliente" name="cliente" id="cliente">
+       <input type="submit" id="enviar_cliente">
+
+
+       <div class="respuesta_cliente">
+       </div>
+   </form>
+
+
+
+   <div class="box__addUser" style="display: none; margin-top: 40px;">
+
+      <h2>Ingrese cliente</h2>
+      <form action="">
+        <input type="text" name="add_dni" id="add_dni" placeholder="Añadir dni">
+        <input type="text" name="add_nombre" id="add_nombre" placeholder="Añadir nombre">
+
+        <a href="#" id="insertar_registro">Insertar</a>
+      </form>
+   </div>
 
 
 
@@ -107,6 +131,95 @@ if($result){
 
        })
 
+
+
+       //acciones del modulo cliente
+
+       $('#enviar_cliente').click(function(event){
+           event.preventDefault();
+
+            var cliente = $('#cliente').val();
+
+
+            if(cliente == '') return false;
+            
+            $.ajax({
+              url : 'getCliente.php', 
+              data : {
+                'cliente' : cliente,
+              },
+              type : 'POST',
+              success : function( data ){
+                //Ok , la info que me devolviste, si es que tiene, agregamela en html
+                let result = JSON.parse(data);
+
+
+                if(!result){
+                  $('.box__addUser').show();
+                }
+
+
+                $('.respuesta_cliente').html('');
+
+                if(result){
+                  // tenemos que appendear la info al nodo .resultado
+                  for (p in result) {
+                    $('.respuesta_cliente').append('<input type="checkbox" data-dni="'+ result[p].dni+'" name="cliente_checkbox" id="prod_'+ result[p].id +'  "><label for="prod_'+ result[p].dni+'" >'+ result[p].nombre+' (DNI: ' + result[p].dni + ')  </label> <br>')
+                  }
+
+                  $('.respuesta_cliente').append('<br><br><a href="#" id="enviar_orden">Enviar orden</a>');
+
+                }else{
+                  $('.respuesta_cliente').html('No hay resultados')
+                }
+
+
+
+                $('#enviar_orden').click(function(e){
+                  e.preventDefault();
+
+                  var todoloschequeados = $('[name=productos]:checked');
+
+                  var price = 0;
+
+                  // es mostrar que diga cuanto plata tiene en el carrito.
+                  todoloschequeados.each(function( index ) {
+                    var elemento = $(this);
+                    price += elemento.data('price');
+                  });
+
+
+                  alert('La suma total del carro es: $' + price);
+                })
+              }
+            });
+
+       })
+
+
+
+       //insertar registro
+       $('#insertar_registro').click(function(event){
+           event.preventDefault();
+
+            var dni = $('#add_dni').val();
+            var nombre = $('#add_nombre').val();
+            
+            $.ajax({
+              url : 'insertCliente.php', 
+              data : {
+                'dni' : dni,
+                'nombre' : nombre
+              },
+              type : 'POST',
+              success : function( data ){
+                //Ok , la info que me devolviste, si es que tiene, agregamela en html
+                let result = JSON.parse(data);
+                $('.box__addUser').append('<p>Registro agregado!</p>');
+              }
+            });
+
+       })
 
    </script>
 </body>
