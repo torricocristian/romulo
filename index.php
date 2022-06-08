@@ -15,9 +15,6 @@ echo mysqli_connect_error();
 // 1st Query
 $result = $db->query("SELECT * FROM cliente");
 if($result){
-    
-    var_dump($result->fetch_object());
-
     $result->close();
     $db->next_result();
 }
@@ -78,7 +75,7 @@ if($result){
                 if(result){
                   // tenemos que appendear la info al nodo .resultado
                   for (p in result) {
-                    $('.respuesta').append('<input type="checkbox" data-price="'+ result[p].precio+'" name="productos" id="prod_'+ result[p].id+'"><label for="prod_'+ result[p].id+'" >'+ result[p].nombre+'</label> <br>')
+                    $('.respuesta').append('<input type="checkbox" data-price="'+ result[p].precio+'" name="productos" id="prod_'+ result[p].id +'  "><label for="prod_'+ result[p].id+'" >'+ result[p].nombre+' ($' + result[p].precio + ')  </label> <br>')
                   }
 
                   $('.respuesta').append('<br><br><a href="#" id="enviar_orden">Enviar orden</a>');
@@ -86,25 +83,31 @@ if($result){
                 }else{
                   $('.respuesta').html('No hay resultados')
                 }
+
+
+
+                $('#enviar_orden').click(function(e){
+                  e.preventDefault();
+
+                  var todoloschequeados = $('[name=productos]:checked');
+
+                  var price = 0;
+
+                  // es mostrar que diga cuanto plata tiene en el carrito.
+                  todoloschequeados.each(function( index ) {
+                    var elemento = $(this);
+                    price += elemento.data('price');
+                  });
+
+
+                  alert('La suma total del carro es: $' + price);
+                })
               }
             });
 
        })
 
 
-
-
-       //enviar orden
-
-       $('#enviar_orden').click(function(e){
-
-        console.log('enviar trigger');
-        e.preventDefault();
-
-        var todoloschequeados = $('[name=productos]:checked');
-
-        console.log(todoloschequeados);
-       })
    </script>
 </body>
 </html>
